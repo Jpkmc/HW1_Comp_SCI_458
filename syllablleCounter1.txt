@@ -1,0 +1,180 @@
+3.1 First Prompt:“could you write a function called SyllableCounter that is ble to count the amount of syllables in any given English word in java” 
+
+public class SyllableCounter {
+
+    public static int countSyllables(String word) {
+        if (word == null || word.isEmpty()) {
+            return 0;
+        }
+
+        word = word.toLowerCase().trim();
+
+        // If word is very short, assume 1 syllable
+        if (word.length() <= 3) {
+            return 1;
+        }
+
+        // Remove trailing silent 'e'
+        if (word.endsWith("e")) {
+            word = word.substring(0, word.length() - 1);
+        }
+
+        // Count groups of vowels
+        int syllables = 0;
+        boolean prevVowel = false;
+        String vowels = "aeiouy";
+
+        for (int i = 0; i < word.length(); i++) {
+            char c = word.charAt(i);
+            boolean isVowel = vowels.indexOf(c) >= 0;
+
+            if (isVowel && !prevVowel) {
+                syllables++;
+            }
+
+            prevVowel = isVowel;
+        }
+
+        // Ensure at least 1 syllable
+        return Math.max(1, syllables);
+    }
+
+    // Quick test
+    public static void main(String[] args) {
+        String[] words = {"syllable", "computer", "rhythm", "beautiful", "queue", "apple", "strengths"};
+        for (String w : words) {
+            System.out.println(w + ": " + countSyllables(w));
+        }
+    }
+}
+
+the second prompt:“these are the correct 3 
+"syllable", (syl-la-ble) 3 "computer", (com-put-er) 
+1 "rhythm", (rhythm) 3 "beautiful", (beau-ti-ful) 
+1 "queue", (queue) 2 "apple", (ap-ple) 1 "strengths", (strengths) 
+2 "business", (busi-ness) 3 "family", (fam-i-ly) 2 "table" (ta-ble) 
+and i keep getting the ones below syllable: 4 computer: 3 rhythm: 
+1 beautiful: 3 queue: 1 apple: 3 strengths: 1 business: 3 family: 3 table: 3” 
+
+public class syllableCounter1 {
+
+    // Count syllables in a single word
+    public static int countSyllables(String word) {
+        word = word.toLowerCase().trim();
+        if (word.isEmpty()) return 0;
+
+        int count = 0;
+        boolean prevVowel = false;
+        String vowels = "aeiouy";
+
+        for (int i = 0; i < word.length(); i++) {
+            char c = word.charAt(i);
+
+            // Check if current char is a vowel
+            boolean isVowel = vowels.indexOf(c) != -1;
+
+            // If it's a vowel and the previous wasn't, count a syllable
+            if (isVowel && !prevVowel) {
+                count++;
+                prevVowel = true;
+            } else if (!isVowel) {
+                prevVowel = false;
+            }
+        }
+
+        // Subtract 1 if word ends with "e" (silent e)
+        if (word.endsWith("e") && count > 1) {
+            count--;
+        }
+        
+        // Adjust for "le" ending (like "table")
+        if (word.endsWith("le") && word.length() > 2 && !vowels.contains("" + word.charAt(word.length() - 3))) {
+            count++;
+        }
+        
+        // Guarantee at least one syllable
+        return Math.max(count, 1);
+    }
+
+    public static void main(String[] args) {
+        String[] words = {
+            "syllable", "computer", "rhythm", "beautiful",
+            "queue", "apple", "strengths", "business", "family", "table"
+        };
+
+        for (String word : words) {
+            int syllables = countSyllables(word);
+            System.out.println(syllables + " " + word);
+        }
+    }
+}
+
+
+third prompt:”business is still giving me 3”
+
+
+ // Special Rule: "-ness" words like "business"
+        if (word.endsWith("ness") && count > 2) {
+            count--;
+        }
+
+foruth prompt:"assertEquals(0, syllableCounter1.countSyllables(null)); // null input is fialing"
+ if (word == null || word.trim().isEmpty()) {
+        return 0;
+    }
+
+
+3.2 prompt: "Prompt “could you make this a unit test Sample words Number of syllables Sky 
+1 Rhythm 1 Book 1 Apple 2 Happy 2 Open 2 Animal 3 Chocolate 3 Computer 3 Celebration 
+4 Voluntary 4 California 4 Incomparable 5 Opportunity 5 Misunderstanding 5 Unintentionally 6 or more 
+Misinterpretation 6 or more Incomprehensible 6 or more Disproportionately 6 or more Unconstitutionalities 7 or more 
+Incomprehensibility 7 or more Internationalization 7 or more Antidisestablishmentarianism 10 or more”
+
+import static org.junit.Assert.*;
+import org.junit.Test;
+
+public class SyllableCounterTest {
+
+    private final SyllableCounter sc = new SyllableCounter();
+
+    @Test
+    public void testBasicWords() {
+        assertEquals(1, sc.countSyllables("Sky"));
+        assertEquals(1, sc.countSyllables("Rhythm"));
+        assertEquals(1, sc.countSyllables("Book"));
+        assertEquals(2, sc.countSyllables("Apple"));
+        assertEquals(2, sc.countSyllables("Happy"));
+        assertEquals(2, sc.countSyllables("Open"));
+        assertEquals(3, sc.countSyllables("Animal"));
+        assertEquals(3, sc.countSyllables("Chocolate"));
+        assertEquals(3, sc.countSyllables("Computer"));
+        assertEquals(4, sc.countSyllables("Celebration"));
+        assertEquals(4, sc.countSyllables("Voluntary"));
+        assertEquals(4, sc.countSyllables("California"));
+        assertEquals(5, sc.countSyllables("Incomparable"));
+        assertEquals(5, sc.countSyllables("Opportunity"));
+        assertEquals(5, sc.countSyllables("Misunderstanding"));
+    }
+
+    @Test
+    public void testLongWords() {
+        assertTrue(sc.countSyllables("Unintentionally") >= 6);
+        assertTrue(sc.countSyllables("Misinterpretation") >= 6);
+        assertTrue(sc.countSyllables("Incomprehensible") >= 6);
+        assertTrue(sc.countSyllables("Disproportionately") >= 6);
+        assertTrue(sc.countSyllables("Unconstitutionalities") >= 7);
+        assertTrue(sc.countSyllables("Incomprehensibility") >= 7);
+        assertTrue(sc.countSyllables("Internationalization") >= 7);
+        assertTrue(sc.countSyllables("Antidisestablishmentarianism") >= 10);
+    }
+
+    @Test
+    public void testEdgeCases() {
+        assertEquals(0, sc.countSyllables(null));
+        assertEquals(0, sc.countSyllables(""));
+        assertEquals(0, sc.countSyllables("   "));
+    }
+}
+
+
+
